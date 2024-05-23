@@ -1,0 +1,304 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Answer {
+  idx         Int       @id @default(autoincrement())
+  questionIdx Int       @map("question_idx")
+  teacherIdx  Int       @map("teacher_idx")
+  content     String
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(6)
+  Question    Question  @relation(fields: [questionIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_question__to_answer_")
+  Teacher     Teacher   @relation(fields: [teacherIdx], references: [userIdx], onDelete: NoAction, onUpdate: NoAction, map: "fk_teacher__to_answer_")
+
+  @@map("answer_tb")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ArLearning {
+  idx             Int             @id @default(autoincrement())
+  description     String          @db.VarChar
+  arData          String          @map("ar_data") @db.VarChar
+  createdAt       DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime        @default(now()) @map("updated_at") @db.Timestamptz(6)
+  LearningContent LearningContent @relation(fields: [idx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_learning_content__to_ar_learning_")
+
+  @@map("ar_learning_tb")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Banner {
+  idx       Int       @id @default(autoincrement())
+  title     String    @db.VarChar
+  content   String    @db.VarChar
+  link      String    @db.VarChar
+  imagePath String    @map("image_path")
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  @@map("banner_tb")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model BlockCoding {
+  idx             Int             @id @default(autoincrement())
+  description     String          @db.VarChar
+  gameData        String          @map("game_data") @db.VarChar
+  createdAt       DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime        @default(now()) @map("updated_at") @db.Timestamptz(6)
+  LearningContent LearningContent @relation(fields: [idx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_learning_content__to_block_coding_")
+
+  @@map("block_coding_tb")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ClassCurriculum {
+  classIdx      Int        @map("class_idx")
+  curriculumIdx Int        @map("curriculum_idx")
+  Class         Class      @relation(fields: [classIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_class__to_class_curriculum_")
+  Curriculum    Curriculum @relation(fields: [curriculumIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_curriculum__to_class_curriculum_")
+
+  @@id([classIdx, curriculumIdx])
+  @@map("class_curriculum_tb")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Class {
+  idx             Int               @id @default(autoincrement())
+  teacherIdx      Int?              @map("teacher_idx")
+  name            String            @db.VarChar
+  createdAt       DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime          @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt       DateTime?         @map("deleted_at") @db.Timestamptz(6)
+  ClassCurriculum ClassCurriculum[]
+  Teacher         Teacher?          @relation(fields: [teacherIdx], references: [userIdx], onDelete: NoAction, onUpdate: NoAction, map: "fk_teacher__to_class_")
+  Question        Question[]
+  Student         Student[]
+
+  @@map("class_tb")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Curriculum {
+  idx             Int               @id @default(autoincrement())
+  title           String            @db.VarChar
+  summary         String            @db.VarChar
+  order           Int?
+  description     String            @db.VarChar
+  imagePath       String            @map("image_path")
+  blockedAt       DateTime?         @map("blocked_at") @db.Timestamptz(6)
+  createdAt       DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime          @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt       DateTime?         @map("deleted_at") @db.Timestamptz(6)
+  ClassCurriculum ClassCurriculum[]
+  LearningContent LearningContent[]
+
+  @@map("curriculum_tb")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Inquiry {
+  idx       Int       @id @default(autoincrement())
+  author    String    @db.VarChar
+  email     String    @db.VarChar
+  content   String
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  @@map("inquiry_tb")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Institute {
+  idx                Int       @id @default(autoincrement())
+  name               String    @db.VarChar
+  managerName        String    @map("manager_name") @db.VarChar
+  managerPhoneNumber String    @map("manager_phone_number") @db.Char(11)
+  startedAt          DateTime  @map("started_at") @db.Timestamptz(6)
+  endAt              DateTime  @map("end_at") @db.Timestamptz(6)
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt          DateTime? @map("deleted_at") @db.Timestamptz(6)
+  Teacher            Teacher[]
+
+  @@map("institute_tb")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model LearningContent {
+  idx             Int                   @id @default(autoincrement())
+  curriculumIdx   Int?                  @map("curriculum_idx")
+  title           String                @db.VarChar
+  order           Int?
+  blockedAt       DateTime?             @map("blocked_at") @db.Timestamptz(6)
+  createdAt       DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime              @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt       DateTime?             @map("deleted_at") @db.Timestamptz(6)
+  type            LEARNING_CONTENT_TYPE
+  ArLearning      ArLearning?
+  BlockCoding     BlockCoding?
+  ContentComplete contentComplete[]
+  Curriculum      Curriculum?           @relation(fields: [curriculumIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_curriculum__to_learning_content_")
+  LectureVideo    LectureVideo?
+  Quiz            Quiz[]
+
+  @@map("learning_content_tb")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model LectureVideo {
+  idx                  Int                    @id @default(autoincrement())
+  url                  String
+  videoLength          Int                    @map("video_length")
+  createdAt            DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime               @default(now()) @map("updated_at") @db.Timestamptz(6)
+  LectureVideoProgress lectureVideoProgress[]
+  LearningContent      LearningContent        @relation(fields: [idx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_learning_content__to_lecture_video_")
+
+  @@map("lecture_video_tb")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Question {
+  idx        Int       @id @default(autoincrement())
+  studentIdx Int       @map("student_idx")
+  classIdx   Int       @map("class_idx")
+  content    String
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt  DateTime? @map("deleted_at") @db.Timestamptz(6)
+  Answer     Answer[]
+  Class      Class     @relation(fields: [classIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_class__to_question_")
+  Student    Student   @relation(fields: [studentIdx], references: [userIdx], onDelete: NoAction, onUpdate: NoAction, map: "fk_student__to_question_")
+
+  @@map("question_tb")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model QuizSelection {
+  idx          Int          @id @default(autoincrement())
+  quizIdx      Int          @map("quiz_idx")
+  selectNumber Int          @map("select_number") @db.SmallInt
+  content      String       @db.VarChar
+  correct      Boolean      @default(false)
+  createdAt    DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime     @default(now()) @map("updated_at") @db.Timestamptz(6)
+  QuizAnswer   QuizAnswer[]
+  Quiz         Quiz         @relation(fields: [quizIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_quiz_tb_to_quiz_selection_tb")
+
+  @@map("quiz_selection_tb")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Quiz {
+  idx                Int             @id @default(autoincrement())
+  learningContentIdx Int             @map("learning_content_idx")
+  question           String          @db.VarChar
+  imagePath          String          @map("image_path") @db.VarChar
+  createdAt          DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime        @default(now()) @map("updated_at") @db.Timestamptz(6)
+  QuizSelection      QuizSelection[]
+  LearningContent    LearningContent @relation(fields: [learningContentIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "quiz_tb_learning_content_tb_idx_fk")
+
+  @@map("quiz_tb")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model QuizAnswer {
+  studentIdx       Int           @map("student_idx")
+  quizSelectionIdx Int           @map("quiz_selection_idx")
+  createdAt        DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  QuizSelection    QuizSelection @relation(fields: [quizSelectionIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_quiz_selection_tb_to_quiz_answer_tb")
+  User             User          @relation(fields: [studentIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_tb_to_quiz_answer_tb")
+
+  @@id([studentIdx, quizSelectionIdx], map: "quiz_answer_tb_pk")
+  @@map("quiz_answer_tb")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Student {
+  userIdx              Int                    @id @map("user_idx")
+  classIdx             Int?                   @map("class_idx")
+  ContentComplete      contentComplete[]
+  LectureVideoProgress lectureVideoProgress[]
+  Question             Question[]
+  Class                Class?                 @relation(fields: [classIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_class__to_student_")
+  User                 User                   @relation(fields: [userIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_user__to_student_")
+
+  @@map("student_tb")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Teacher {
+  userIdx      Int        @id @default(autoincrement()) @map("user_idx")
+  instituteIdx Int?       @map("institute_idx")
+  email        String     @db.VarChar
+  Answer       Answer[]
+  Class        Class[]
+  Institute    Institute? @relation(fields: [instituteIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_institute__to_teacher_")
+  User         User       @relation(fields: [userIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_user__to_teacher_")
+
+  @@map("teacher_tb")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model User {
+  idx         Int          @id @default(autoincrement())
+  loginId     String       @map("login_id") @db.VarChar
+  password    String       @db.VarChar
+  name        String       @db.VarChar
+  phoneNumber String       @map("phone_number") @db.Char(11)
+  role        Int          @db.SmallInt
+  blockedAt   DateTime?    @map("blocked_at") @db.Timestamptz(6)
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime     @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt   DateTime?    @map("deleted_at") @db.Timestamptz(6)
+  QuizAnswer  QuizAnswer[]
+  Student     Student?
+  Teacher     Teacher?
+
+  @@unique([phoneNumber, deletedAt], map: "phone_number_deleted_at")
+  @@unique([loginId, deletedAt], map: "unique_login_id_deleted_at")
+  @@map("user_tb")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model lectureVideoProgress {
+  studentIdx   Int          @map("student_idx")
+  videoIdx     Int          @map("video_idx")
+  watchTime    Int          @map("watch_time")
+  LectureVideo LectureVideo @relation(fields: [videoIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_lecture_video_tb_to_lecture_video_progress_tb")
+  Student      Student      @relation(fields: [studentIdx], references: [userIdx], onDelete: NoAction, onUpdate: NoAction, map: "fk_student_tb_to_lecture_video_progress_tb")
+
+  @@id([studentIdx, videoIdx])
+  @@map("lecture_video_progress_tb")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model contentComplete {
+  userIdx         Int             @map("user_idx")
+  contentIdx      Int             @map("content_idx")
+  createdAt       DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  LearningContent LearningContent @relation(fields: [contentIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_learning_content_tb_to_content_complete_tb")
+  Student         Student         @relation(fields: [userIdx], references: [userIdx], onDelete: NoAction, onUpdate: NoAction, map: "fk_student_tb_to_content_complete_tb")
+
+  @@id([userIdx, contentIdx])
+  @@map("content_complete_tb")
+}
+
+enum LEARNING_CONTENT_TYPE {
+  LectureVideo
+  Quiz
+  ArLearning
+  BlockCoding
+}
