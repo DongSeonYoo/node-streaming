@@ -3,6 +3,7 @@ const videoFile = document.getElementById('video-file');
 
 const videoTag = document.getElementById('video');
 const playBtn = document.getElementById('play-btn');
+const videoIdxInput = document.getElementById('video-idx-input');
 const videoValue = '1716275673865-199907';
 
 const manifestPathTextDiv = document.createElement('div');
@@ -25,7 +26,6 @@ const uploadVideoFetch = async (formData) => {
     });
 
     const json = await response.json();
-
     if (response.status !== 200) {
       return;
     }
@@ -37,13 +37,15 @@ const uploadVideoFetch = async (formData) => {
 };
 
 playBtn.addEventListener('click', async () => {
-  const response = await fetch('http://localhost:3000/learning-content/lecture-video/87');
+  if (!videoIdxInput.value) {
+    alert('비디오 인덱스를 입력해주세요.');
+    return;
+  }
 
+  const response = await fetch(`/learning-content/lecture-video/${videoIdxInput.value}`);
   const json = await response.json();
-
   if (response.status !== 200) {
     alert(`response.status: ${response.status}\nmessage: ${json.message}`);
-
     return;
   }
 
